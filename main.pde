@@ -1,3 +1,7 @@
+import toxi.geom.*;
+import toxi.geom.mesh.*;
+import toxi.processing.*;
+
 int w = 800;
 int h = 600;
 

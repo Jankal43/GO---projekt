@@ -45,9 +45,9 @@ class Person {
     // Głowa
     fill(255, 200, 200);
     translate(0, -200, 0); // Przesunięcie głowy w górę
-    noStroke();
+    noStroke(); // TROJKAt
     sphere(35);
-    stroke(0);
+    stroke(0); //TROJKAT
   
     // Tułów
     fill(100, 150, 255);
