@@ -1,10 +1,10 @@
-import toxi.geom.*;
-import toxi.geom.mesh.*;
-import toxi.processing.*;
+//import toxi.geom.*;
+//import toxi.geom.mesh.*;
+//import toxi.processing.*;
 
 int w = 800;
 int h = 600;
-
+RangeTree1D<Car> carTree; // Deklaracja pola
 int collisionCountRed = 0; // Globalna zmienna do przechowywania liczby kolizji czerwonego auta
 int collisionCountBlue = 0; // Globalna zmienna do przechowywania liczby kolizji niebieskiego auta
 
@@ -16,6 +16,10 @@ void settings() {
 void setup(){
   ca = new carFrame();
   pe = new personFrame();
+  
+   carTree = new RangeTree1D<>(); // Inicjalizacja w funkcji setup
+   carTree.insert(new Car(65, 35, 800, 0, 0, -random(2, 20), color(0, 0, 200)));
+   carTree.insert(new Car(-65, 35, -800, 0, 0, random(2, 20), color(200, 0, 0)));
 }
 
 menu m = new menu();
@@ -86,39 +90,50 @@ void draw() {
     }
 
     // auto
-    for (int i = 0; i < cars.size(); i++) {
-      Car c = cars.get(i);
-      c.frameMovement();
-      c.drawShape();
+    float minX = -1000; // minimalna współrzędna X
+    float maxX = 1000;  // maksymalna współrzędna X
 
-      for (int j = 0; j < ppl.size(); j++) {
-        Person p = ppl.get(j);
-        if (checkCollision(c, p)) {
-          if (c.getColor() == color(200, 0, 0)) {
-            collisionCountRed++;
-          } else if (c.getColor() == color(0, 0, 200)) {
-            collisionCountBlue++;
-          }
-          ppl.remove(j);
-          j--;
-        }
-      }
+    List<Car> carsInRange = carTree.queryRange(new Car(minX, 0, 0, 0, 0, 0, color(0, 0, 0)), new Car(maxX, 0, 0, 0, 0, 0, color(0, 0, 0)));
 
-      if (c.isOut()) {
-        if (c.getDirection(2) < 0) {
-          cars.remove(c);
-          i--;
-          cars.add(new Car(
-            65, 35, 800,
-            0, 0, -random(2, 20), color(0, 0, 200)));
-        } else {
-          cars.remove(c);
-          i--;
-          cars.add(new Car(
-            -65, 35, -800,
-            0, 0, random(2, 20), color(200, 0, 0)));
+    for (Car c : carsInRange) {
+        c.frameMovement();
+        c.drawShape();
+
+        // Sprawdzanie kolizji z osobami
+        for (int j = 0; j < ppl.size(); j++) {
+            Person p = ppl.get(j);
+            if (checkCollision(c, p)) {
+                if (c.getColor() == color(200, 0, 0)) {
+                    collisionCountRed++;
+                } else if (c.getColor() == color(0, 0, 200)) {
+                    collisionCountBlue++;
+                }
+                ppl.remove(j);
+                j--;
+            }
         }
-      }
+
+        if (c.isOut()) {
+          if (c.posZ > 0) {
+            if (c.getColor() == color(0, 0, 200)) {
+                carTree.remove(c); 
+                carTree.insert(new Car(65, 35, 800, 0, 0, -random(2, 20), color(0, 0, 200))); 
+              }
+              if (c.getColor() == color(200, 0, 0)) {
+                carTree.remove(c); 
+                carTree.insert(new Car(-65, 35, -800, 0, 0, random(2, 20), color(200, 0, 0))); 
+              }
+            } else {
+              if (c.getColor() == color(0, 0, 200)) {
+                  carTree.remove(c); 
+                  carTree.insert(new Car(65, 35, 800, 0, 0, -random(2, 20), color(0, 0, 200))); 
+                }
+                if (c.getColor() == color(200, 0, 0)) {
+                  carTree.remove(c); 
+                  carTree.insert(new Car(-65, 35, -800, 0, 0, random(2, 20), color(200, 0, 0))); 
+                }
+           }
+        }
     }
 
     // Wyłącz testowanie głębokości przed rysowaniem tekstu
@@ -174,7 +189,7 @@ boolean checkCollision(Car car, Person person) {
   float distance = dist(car.posX, car.posY, car.posZ, person.posX, person.posY, person.posZ);
   float collisionDistance = 50; // Odległość, w której uznajemy kolizję (można dostosować w zależności od wielkości obiektów)
 
-  return distance < collisionDistance;
+    return distance < collisionDistance;
 }
 
 

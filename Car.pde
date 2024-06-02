@@ -1,35 +1,39 @@
-class Car {
-  float posX;
-  float posY;
-  float posZ;
-  float vX;
-  float vY;
-  float vZ;
-  color col; // Zmieniona nazwa zmiennej na 'col'
+class Car implements Comparable<Car> {
+    float posX;
+    float posY;
+    float posZ;
+    float vX;
+    float vY;
+    float vZ;
+    color col; // Zmieniona nazwa zmiennej na 'col'
 
-  public Car(
-    float posX,
-    float posY,
-    float posZ,
-    float vX,
-    float vY,
-    float vZ,
-    color col // Zmieniona nazwa parametru na 'col'
-  ){
-    this.posX = posX;
-    this.posY = posY;
-    this.posZ = posZ;
-    this.vX = vX;
-    this.vY = vY;
-    this.vZ = vZ;
-    this.col = col; // Zmieniona nazwa zmiennej na 'col'
-  }
+    public Car(
+        float posX,
+        float posY,
+        float posZ,
+        float vX,
+        float vY,
+        float vZ,
+        color col // Zmieniona nazwa parametru na 'col'
+    ){
+        this.posX = posX;
+        this.posY = posY;
+        this.posZ = posZ;
+        this.vX = vX;
+        this.vY = vY;
+        this.vZ = vZ;
+        this.col = col; // Zmieniona nazwa zmiennej na 'col'
+    }
   
   void frameMovement(){
     posX += vX;
     posY += vY;
     posZ += vZ;
   }
+  @Override
+    public int compareTo(Car otherCar) {
+        return Float.compare(this.posX, otherCar.posX);
+    }
   
   void drawShape(){
     pushMatrix();
